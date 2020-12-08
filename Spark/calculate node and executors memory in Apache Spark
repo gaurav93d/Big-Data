@@ -1,0 +1,40 @@
+If we have following hardware then calculate spark
+
+6 Node
+16 core
+64 GB of Ram
+Number of executer (--num -executors)
+Cores for each executer(--executor-cores)
+Memory for each executer (--executor-memory)
+--executer-memory controls the heap size
+Node some overhead(controlled by spark.yarn.executor.memory.overhead) for off heap memory default is max (384 MB ,.07* Spark.executer.memory)
+15 cores per executer can lead to bad HDFS I/O throughput.
+Best is to keep under 5 cores per executor (As per cloudera documents)
+
+
+Calculations:
+
+5 core per executor
+-For max HDFS throughput
+Cluster has 6*15 =90 cores in total
+after taking out Hadoop /Yarn daemon cores)
+90 cores /5 cores/executor (19/5=18-1)
+=18 executors
+Each node has 3 executors
+63 GB/3 =21 GB ,21*(1 -0.07)
+~19 GB
+1 executor for AM=> 17 executor
+Ans
+
+17 Executors in total
+19 GB memory /executor
+5 cores /executor
+Dynamic resources allocation in production not recommended as you already aware your requirements and resources.
+Dynamic allocation you can use in before pro to play
+Partition rule of thumb 128 MB per partition
+If partition less but near 2000 bump to more than 2000 (Spark hardcoded value is 2000 for compress )
+Shuffles are t be avoided
+Cross Join should be avoided
+ReduceByKey over GroupByKey
+TreesReduce over Reduce
+Use complex/Nested type
